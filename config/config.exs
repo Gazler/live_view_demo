@@ -13,11 +13,11 @@ config :live_view_demo,
 # Configures the endpoint
 config :live_view_demo, LiveViewDemoWeb.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "dummy_val_for_dev_env",
+  secret_key_base: "XrPGx4uDP3KtoaFDUj8fObcBUTOF9BrzMJZwaY3zPYXPXGqNXGus0iUNDXtAnkd4",
   render_errors: [view: LiveViewDemoWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: LiveViewDemo.PubSub, adapter: Phoenix.PubSub.PG2],
   live_view: [
-    signing_salt: "another_dummy_val_for_dev_env"
+    signing_salt: "CohRB/QmEGB9VXRGfwakZuJJ+KdeMY8eiIE7BQDqiXT15tWYSMWlkVAjl5a2+SdC"
   ]
 
 # Configures Elixir's Logger

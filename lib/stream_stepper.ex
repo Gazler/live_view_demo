@@ -1,4 +1,6 @@
 defmodule StreamStepper do
+  use Boundary, deps: [], exports: []
+
   def stream_stepper(stream) do
     stream
     |> Enumerable.reduce({:cont, nil}, &stream_stepper_suspender/2)
@@ -35,4 +37,3 @@ defmodule StreamStepper do
     end
   end
 end
-

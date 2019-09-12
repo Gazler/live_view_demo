@@ -7,7 +7,7 @@ defmodule LiveViewDemo.MixProject do
       version: "0.1.0",
       elixir: "~> 1.9.1",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      compilers: [:phoenix, :gettext] ++ Mix.compilers() ++ [:boundary],
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -33,6 +33,7 @@ defmodule LiveViewDemo.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:boundary, github: "sasa1977/boundary"},
       {:phoenix, "~> 1.4.9"},
       {:phoenix_pubsub, "~> 1.1"},
       {:phoenix_ecto, "~> 4.0"},

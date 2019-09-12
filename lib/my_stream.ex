@@ -1,4 +1,5 @@
 defmodule MyStream do
+  use Boundary, deps: [], exports: []
   alias MyStream.MergeServer
 
   def test() do

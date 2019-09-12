@@ -1,5 +1,6 @@
 defmodule Game do
-  alias Game.{GameServer, GameState, Puzzle}
+  use Boundary, deps: [], exports: []
+  alias Game.{GameState, Puzzle}
 
   @doc """
   An example seed: :rand.seed_s(:exsss)

@@ -1,4 +1,6 @@
 defmodule LiveViewDemoWeb do
+  use Boundary, deps: [Game], exports: []
+
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, views, channels and so on.

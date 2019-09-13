@@ -25,7 +25,8 @@ defmodule LiveViewDemo.Games.Model.Game do
          %{
            game
            | remaining_time: game.remaining_time + 1,
-             puzzle: next_puzzle
+             puzzle: next_puzzle,
+             score: game.score + 1
          }}
 
       false ->

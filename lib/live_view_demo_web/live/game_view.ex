@@ -8,18 +8,18 @@ defmodule LiveViewDemoWeb.GameLive do
 
   def render(assigns) do
     ~L"""
-    <div phx-keyup="digit" phx-target="document">
+    <div phx-keydown="digit" phx-target="window">
       <div style="background-color: blue; width: <%= @remaining_time %>%; height: 2em; margin-left: auto; margin-right: auto;"></div>
       <div style="text-align: center; font-size: 2em; width: 100%;">
         Type the result of multiplication to begin
       </div><div style="text-align: center; font-size: 2em; width: 100%;">
-        Your score: 0
+        Your score: <%= @score %>
       </div>
       <div style="text-align: center; font-size: 2em; width: 100%;">
         <%= @puzzle %>
       </div>
       <div style="text-align: center; font-size: 2em; width: 100%;">
-        <p>TODO PRINT GUESS</p>
+        <p> <%= @guess %></p>
       </div>
     </div>
     """
@@ -29,7 +29,7 @@ defmodule LiveViewDemoWeb.GameLive do
     socket =
       socket
       |> maybe_start_game()
-      |> assign(%{remaining_time: 0, puzzle: "", guess: ""})
+      |> assign(%{remaining_time: 0, puzzle: "", guess: "", score: 0})
 
     {:ok, socket}
   end
@@ -60,19 +60,33 @@ defmodule LiveViewDemoWeb.GameLive do
     end
   end
 
-  def handle_event(any, key, socket) do
-    IO.inspect(any)
-    IO.inspect(key)
-    IO.inspect(socket)
-  end
-
   def handle_event("digit", key, socket) do
-    IO.inspect(key)
-    {:noreply, socket}
-  end
+    potential_number = key["key"]
 
-  # def handle_event("digit", @down_key, socket) do
-  #  {:ok, new_temp} = Thermostat.dec_temperature(socket.assigns.id)
-  #  {:noreply, assign(socket, :temperature, new_temp)}
-  # end
+    case Integer.parse(potential_number) do
+      :error ->
+        {:noreply, socket}
+
+      {_integer, ""} ->
+        new_guess = socket.assigns.guess <> potential_number
+
+        case Games.player_input(socket.assigns.game_handle, new_guess) do
+          {:correct, game_state} ->
+            socket =
+              socket
+              |> assign(%{guess: ""})
+              |> assign(game_state)
+
+            {:noreply, socket}
+
+          {:incorrect, game_state} ->
+            socket =
+              socket
+              |> assign(%{guess: new_guess})
+              |> assign(game_state)
+
+            {:noreply, socket}
+        end
+    end
+  end
 end

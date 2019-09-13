@@ -1,7 +1,7 @@
-defmodule LiveViewDemo.Game.Model.Game do
+defmodule LiveViewDemo.Games.Model.Game do
   defstruct [:remaining_time, :puzzle, :seed_state]
 
-  alias LiveViewDemo.Game.Model.{Game, Puzzle}
+  alias LiveViewDemo.Games.Model.{Game, Puzzle}
 
   @opaque t :: %__MODULE__{
             remaining_time: integer(),

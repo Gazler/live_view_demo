@@ -1,7 +1,7 @@
-defmodule LiveViewDemo.Game.Model.MultPuzzle do
+defmodule LiveViewDemo.Games.Model.MultPuzzle do
   defstruct [:factor1, :factor2, :result, :seed_state]
 
-  alias LiveViewDemo.Game.Model.MultPuzzle
+  alias LiveViewDemo.Games.Model.MultPuzzle
 
   @opaque t :: %__MODULE__{
             factor1: integer(),

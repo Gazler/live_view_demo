@@ -1,5 +1,5 @@
-defmodule LiveViewDemo.Game.Model.Puzzle do
-  alias LiveViewDemo.Game.Model.MultPuzzle
+defmodule LiveViewDemo.Games.Model.Puzzle do
+  alias LiveViewDemo.Games.Model.MultPuzzle
 
   @opaque t :: MultPuzzle.t()
 

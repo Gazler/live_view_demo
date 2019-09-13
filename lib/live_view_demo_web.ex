@@ -1,5 +1,5 @@
 defmodule LiveViewDemoWeb do
-  use Boundary, deps: [Game], exports: []
+  use Boundary, deps: [LiveViewDemo.Games], exports: [Endpoint]
 
   @moduledoc """
   The entrypoint for defining your web interface, such

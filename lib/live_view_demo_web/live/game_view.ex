@@ -1,7 +1,7 @@
 defmodule LiveViewDemoWeb.GameLive do
   use Phoenix.LiveView
   import Phoenix.HTML.Form
-  alias Game.GameServer
+  alias LiveViewDemo.Games
 
   defmodule PlayerInput do
     defstruct [:guessed_number]
@@ -24,7 +24,7 @@ defmodule LiveViewDemoWeb.GameLive do
   end
 
   def mount(_session, socket) do
-    {:ok, pid} = GameServer.start_link(:rand.seed(:exsss))
+    {:ok, pid} = Games.new()
     if connected?(socket), do: :timer.send_interval(1000, self(), :tick)
 
     socket =
@@ -50,8 +50,8 @@ defmodule LiveViewDemoWeb.GameLive do
       player_input
       |> player_input_changeset()
 
-    {correct_or_incorrect, {remaining_time, puzzle}} =
-      GameServer.player_input(pid, changeset.changes.guessed_number)
+    {correct_or_incorrect, %{remaining_time: remaining_time, puzzle: puzzle}} =
+      Games.player_input(pid, changeset.changes.guessed_number)
 
     changeset =
       case correct_or_incorrect do
@@ -72,9 +72,15 @@ defmodule LiveViewDemoWeb.GameLive do
 
   def handle_info(:tick, socket) do
     pid = socket.assigns.server_pid
-    {remaining_time, puzzle} = GameServer.tick(pid)
 
-    {:noreply, assign(socket, %{remaining_time: remaining_time, puzzle: puzzle})}
+    case Games.tick(pid) do
+      {:continue, game} ->
+        {:noreply, assign(socket, game)}
+
+      {:stop, game} ->
+        # TODO stop the timer
+        {:noreply, assign(socket, game)}
+    end
   end
 
   defp player_input_changeset(params) do

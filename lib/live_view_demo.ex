@@ -1,5 +1,5 @@
 defmodule LiveViewDemo do
-  use Boundary, deps: [], exports: []
+  use Boundary, deps: [LiveViewDemoWeb], exports: []
 
   @moduledoc """
   LiveViewDemo keeps the contexts that define your domain

@@ -34,6 +34,11 @@ defmodule LiveViewDemo.MixProject do
   defp deps do
     [
       {:boundary, github: "sasa1977/boundary"},
+      {:dialyxir,
+       only: [:dev, :test],
+       runtime: false,
+       github: "jeremyjh/dialyxir",
+       ref: "a27b0c55401e5953ba85f4ace94dbdaf002cd0f7"},
       {:phoenix, "~> 1.4.9"},
       {:phoenix_pubsub, "~> 1.1"},
       {:phoenix_ecto, "~> 4.0"},

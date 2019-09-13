@@ -9,26 +9,17 @@ defmodule LiveViewDemo.Games.Model.Game do
             score: non_neg_integer()
           }
 
-  @spec new(:rand.seed_state()) :: {:ok, t()} | {:error, any()}
+  @spec new(:rand.state()) :: {:ok, t()}
   def new(seed_state) do
-    case Puzzle.new(seed_state) do
-      {:ok, puzzle} ->
-        {:ok,
-         %Game{
-           puzzle: puzzle,
-           remaining_time: 10
-         }}
-
-      {:error, _} = error ->
-        error
-    end
+    {:ok, puzzle} = Puzzle.new(seed_state)
+    {:ok, %Game{puzzle: puzzle, remaining_time: 10, score: 0}}
   end
 
   @spec guess(t(), Guess.t()) :: {:correct, t()} | {:incorrect, t()}
   def guess(game, guess) do
     case Puzzle.correct?(game.puzzle, Guess.to_integer(guess)) do
       true ->
-        {:ok, next_puzzle} = Puzzle.next(game.puzzle)
+        next_puzzle = Puzzle.next(game.puzzle)
 
         {:correct,
          %{

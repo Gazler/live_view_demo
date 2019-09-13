@@ -7,25 +7,13 @@ defmodule LiveViewDemo.Games.Model.MultPuzzle do
             factor1: integer(),
             factor2: integer(),
             result: integer(),
-            seed_state: :rand.seed_state()
+            seed_state: :rand.state()
           }
 
-  @spec new(:rand.seed_state()) :: {:ok, t()} | {:error, any()}
+  @spec new(:rand.state()) :: {:ok, t()} | {:error, any()}
   def new(seed_state) do
-    case cast(seed_state) do
-      {:ok, seed_state} ->
-        next_puzzle(seed_state)
-
-      {:error, _} = error ->
-        error
-    end
+    {:ok, next_puzzle(seed_state)}
   end
-
-  defp cast({_alg_type, _alg_state} = seed_state) do
-    {:ok, seed_state}
-  end
-
-  defp cast(_), do: {:error, "Please use :rand.seed_s(:exsss)"}
 
   @spec next(t()) :: t()
   def next(%MultPuzzle{seed_state: seed_state}) do

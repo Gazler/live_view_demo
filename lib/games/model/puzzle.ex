@@ -3,11 +3,10 @@ defmodule LiveViewDemo.Games.Model.Puzzle do
 
   @opaque t :: MultPuzzle.t()
 
-  @spec new(:rand.seed_state()) :: {:ok, t()} | {:error, any()}
+  @spec new(:rand.state()) :: {:ok, t()} | {:error, any()}
   def new(seed_state) do
     case MultPuzzle.new(seed_state) do
       {:ok, mult_puzzle} -> {:ok, mult_puzzle}
-      {:error, _} = error -> error
     end
   end
 

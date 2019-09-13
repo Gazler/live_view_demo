@@ -18,7 +18,7 @@ defmodule LiveViewDemo.Games.DA.Games do
 
   @impl true
   def init(seed) do
-    {:ok, Game.new(seed)}
+    Game.new(seed)
   end
 
   @impl true

@@ -1,15 +1,17 @@
-defmodule Game.GameServer do
+defmodule LiveViewDemo.Games.DA.Games do
   use GenServer
-  alias Game
+  alias LiveViewDemo.Games.Model.{Game, Guess}
 
-  def start_link(seed) do
-    GenServer.start_link(__MODULE__, seed)
+  def start_link(seed_state) do
+    GenServer.start_link(__MODULE__, seed_state)
   end
 
+  @spec tick(pid()) :: {:continue, Game.t()} | {:stop, Game.t()}
   def tick(pid) do
     GenServer.call(pid, :tick)
   end
 
+  @spec player_input(pid(), Guess.t()) :: {:correct, Game.t()} | {:incorrect, Game.t()}
   def player_input(pid, input) do
     GenServer.call(pid, {:player_input, input})
   end
@@ -21,12 +23,17 @@ defmodule Game.GameServer do
 
   @impl true
   def handle_call(:tick, _from, game) do
-    game = Game.tick(game)
-    {:reply, Game.public_state(game), game}
+    case Game.tick(game) do
+      {:continue, game} = reply ->
+        {:reply, reply, game}
+
+      {:stop, game} = reply ->
+        {:stop, :normal, reply, game}
+    end
   end
 
   def handle_call({:player_input, input}, _from, game) do
-    {correct_or_incorrect, game} = Game.player_input(game, input)
-    {:reply, {correct_or_incorrect, Game.public_state(game)}, game}
+    {correct_or_incorrect, game} = Game.guess(game, input)
+    {:reply, {correct_or_incorrect, game}, game}
   end
 end

@@ -8,13 +8,18 @@ defmodule LiveViewDemoWeb.GameLive do
 
   def render(assigns) do
     ~L"""
-    <div>
+    <div phx-keyup="digit" phx-target="document">
       <div style="background-color: blue; width: <%= @remaining_time %>%; height: 2em; margin-left: auto; margin-right: auto;"></div>
-      <div style="text-align: center; font-size: 2em; width: 100%;">Type the result of multiplication to begin</div><div style="text-align: center; font-size: 2em; width: 100%;">Your score: 0</div><div style="text-align: center; font-size: 2em; width: 100%;">
+      <div style="text-align: center; font-size: 2em; width: 100%;">
+        Type the result of multiplication to begin
+      </div><div style="text-align: center; font-size: 2em; width: 100%;">
+        Your score: 0
+      </div>
+      <div style="text-align: center; font-size: 2em; width: 100%;">
         <%= @puzzle %>
       </div>
       <div style="text-align: center; font-size: 2em; width: 100%;">
-      <p>TODO PRINT GUESS</p>
+        <p>TODO PRINT GUESS</p>
       </div>
     </div>
     """
@@ -24,7 +29,7 @@ defmodule LiveViewDemoWeb.GameLive do
     socket =
       socket
       |> maybe_start_game()
-      |> assign(%{remaining_time: 0, puzzle: ""})
+      |> assign(%{remaining_time: 0, puzzle: "", guess: ""})
 
     {:ok, socket}
   end
@@ -54,4 +59,20 @@ defmodule LiveViewDemoWeb.GameLive do
         {:noreply, assign(socket, game)}
     end
   end
+
+  def handle_event(any, key, socket) do
+    IO.inspect(any)
+    IO.inspect(key)
+    IO.inspect(socket)
+  end
+
+  def handle_event("digit", key, socket) do
+    IO.inspect(key)
+    {:noreply, socket}
+  end
+
+  # def handle_event("digit", @down_key, socket) do
+  #  {:ok, new_temp} = Thermostat.dec_temperature(socket.assigns.id)
+  #  {:noreply, assign(socket, :temperature, new_temp)}
+  # end
 end

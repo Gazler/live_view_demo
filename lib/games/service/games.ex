@@ -21,4 +21,7 @@ defmodule LiveViewDemo.Games.Service.Games do
       {stop_or_continue, Model.Game.to_map(game)}
     end
   end
+
+  @spec running?(pid()) :: boolean()
+  def running?(pid), do: Process.alive?(pid)
 end

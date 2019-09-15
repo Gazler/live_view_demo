@@ -1,4 +1,45 @@
 /* This file is for your main application css. */
 
-@import "./phoenix.css";
 @import "../../deps/phoenix_live_view/assets/css/live_view.css";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.timer {
+  background-color: blue;
+  margin-left: auto;
+  margin-right: auto;
+  height: 2em;
+}
+
+.keypad {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.key {
+  width: 33.3%;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #F09A9D;
+  border: solid #5B6DCD 1px;
+}
+
+.guess {
+  text-align: center;
+  font-size: 2em;
+  width: 100%;
+}
+
+/* Mobile Styles */
+@media only screen and (min-width: 181px) {
+  .page {
+    width: 180px;
+    margin: 0 auto;
+  }
+}

@@ -10,4 +10,7 @@ defmodule LiveViewDemo.Games do
 
   @spec tick(pid()) :: {:continue, map()} | {:stop, map()}
   defdelegate tick(pid), to: Service.Games
+
+  @spec running?(pid()) :: boolean()
+  defdelegate running?(pid), to: Service.Games
 end

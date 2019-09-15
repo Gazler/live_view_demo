@@ -22,7 +22,7 @@
 
 .key {
   width: 33.3%;
-  height: 60px;
+  height: 80px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -37,9 +37,9 @@
 }
 
 /* Mobile Styles */
-@media only screen and (min-width: 181px) {
+@media only screen and (min-width: 241px) {
   .page {
-    width: 180px;
+    width: 240px;
     margin: 0 auto;
   }
 }

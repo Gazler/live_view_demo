@@ -32,7 +32,7 @@ defmodule LiveViewDemoWeb.GameLive do
 
   defp key(digit) do
     """
-    <div class="key" phx-click="keyclick" phx-value-button="#{digit}">#{digit}</div>
+    <div onclick="" class="key" phx-click="keyclick" phx-value-button="#{digit}">#{digit}</div>
     """
   end
 
@@ -44,7 +44,7 @@ defmodule LiveViewDemoWeb.GameLive do
 
   defp clear do
     """
-    <div class="key" phx-click="keyclick" phx-value-button="clear">Clear<br />Space</div>
+    <div onclick="" class="key" phx-click="keyclick" phx-value-button="clear">Clear<br />Space</div>
     """
   end
 
@@ -91,9 +91,6 @@ defmodule LiveViewDemoWeb.GameLive do
       pressed_key == " " ->
         clear(socket)
 
-      socket.assigns.remaining_time == 0 ->
-        noreply(socket)
-
       :error == parse_result ->
         noreply(socket)
 
@@ -115,20 +112,24 @@ defmodule LiveViewDemoWeb.GameLive do
   end
 
   defp digit(pressed_key, socket) do
-    new_guess = socket.assigns.guess <> pressed_key
+    if Games.running?(socket.assigns.game_handle) do
+      new_guess = socket.assigns.guess <> pressed_key
 
-    case Games.player_input(socket.assigns.game_handle, new_guess) do
-      {:correct, game_state} ->
-        socket
-        |> assign(%{guess: ""})
-        |> assign(game_state)
-        |> noreply()
+      case Games.player_input(socket.assigns.game_handle, new_guess) do
+        {:correct, game_state} ->
+          socket
+          |> assign(%{guess: ""})
+          |> assign(game_state)
+          |> noreply()
 
-      {:incorrect, game_state} ->
-        socket
-        |> assign(%{guess: new_guess})
-        |> assign(game_state)
-        |> noreply()
+        {:incorrect, game_state} ->
+          socket
+          |> assign(%{guess: new_guess})
+          |> assign(game_state)
+          |> noreply()
+      end
+    else
+      noreply(socket)
     end
   end
 

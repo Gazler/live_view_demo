@@ -44,7 +44,7 @@ defmodule LiveViewDemoWeb.GameLive do
 
   defp clear do
     """
-    <div onclick="" class="key" phx-click="keyclick" phx-value-button="clear">Clear<br />Space</div>
+    <div onclick="" class="key" phx-click="keyclick" phx-value-button="clear">Clear<br />(Space)</div>
     """
   end
 

@@ -10,10 +10,11 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: Lato;
 }
 
 .timer {
-  background-color: blue;
+  background-color: #F09A9D;
   margin-left: auto;
   margin-right: auto;
   height: 2em;
@@ -31,7 +32,7 @@
   justify-content: center;
   align-items: center;
   background-color: #F09A9D;
-  border: solid #5B6DCD 1px;
+  border: solid white 1px;
 }
 
 .guess {

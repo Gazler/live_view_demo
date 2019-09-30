@@ -9,7 +9,7 @@ defmodule LiveViewDemoWeb.GameLive do
   def render(assigns) do
     ~L"""
     <div phx-keydown="keypress" phx-target="window" class="page">
-      <div class="timer" style="width: <%= @remaining_time * 10 %>px;"></div>
+      <div class="timer" style="width: <%= @remaining_time * 27 %>px;"></div>
       <div style="text-align: center; font-size: 2em; width: 100%;">
         Score: <%= @score %>
       </div>

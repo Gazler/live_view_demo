@@ -33,6 +33,6 @@ defmodule LiveViewDemo.Games.Model.MultPuzzle do
 
   @spec to_string(t()) :: String.t()
   def to_string(%MultPuzzle{factor1: f1, factor2: f2}) do
-    "#{f1} x #{f2} ="
+    "#{f1} x #{f2}"
   end
 end

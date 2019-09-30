@@ -2,6 +2,8 @@
 
 This is my entry in [Phoenix Phrenzy](https://phoenixphrenzy.com), showing off what [Phoenix](https://phoenixframework.org/) and [LiveView](https://github.com/phoenixframework/phoenix_live_view) can do.
 
+![Live View Math](assets/static/images/thumbnail.png "Live View Math")
+
 # Phrenzy Instructions
 
 Fork this repo and start build an application! See [Phoenix Phrenzy](https://phoenixphrenzy.com) for details.

@@ -1,39 +1,100 @@
 defmodule LiveViewDemo.Games.DA.Games do
   use GenServer
-  alias LiveViewDemo.Games.Model.{Game, Guess}
+  alias LiveViewDemo.Games.Model.{Game, GameFSM, Guess}
 
-  def start_link(seed_state) do
-    GenServer.start_link(__MODULE__, seed_state)
+  @typep state :: %{
+           fsm: GameFSM.t(),
+           game: Game.t()
+         }
+
+  def start_link(seed_state, update_fn) do
+    GenServer.start_link(__MODULE__, %{seed_state: seed_state, update_fn: update_fn})
   end
 
-  @spec tick(pid()) :: {:continue, Game.t()} | {:stop, Game.t()}
-  def tick(pid) do
-    GenServer.call(pid, :tick)
-  end
-
-  @spec player_input(pid(), Guess.t()) :: {:correct, Game.t()} | {:incorrect, Game.t()}
+  @spec player_input(pid(), String.t()) :: {Guess.t(), Game.t()}
   def player_input(pid, input) do
     GenServer.call(pid, {:player_input, input})
   end
 
-  @impl true
-  def init(seed) do
-    Game.new(seed)
+  @spec clear(pid(), :rand.state()) :: Game.t()
+  def clear(pid, seed_state) do
+    GenServer.call(pid, {:clear, seed_state})
   end
 
   @impl true
-  def handle_call(:tick, _from, game) do
-    case Game.tick(game) do
-      {:continue, game} = reply ->
-        {:reply, reply, game}
+  def init(%{seed_state: seed_state, update_fn: update_fn}) do
+    {:ok, game} = Game.new(seed_state)
+    fsm = GameFSM.new()
+    :timer.send_interval(1000, :tick)
+    {:ok, %{game: game, fsm: fsm, update_fn: update_fn}}
+  end
 
-      {:stop, game} = reply ->
-        {:stop, :normal, reply, game}
+  @impl true
+  def handle_info(:tick, state) do
+    with {:ok, rules} <- GameFSM.check(state.fsm, :tick),
+         {continue_or_stop, game} <- Game.tick(state.game),
+         {:ok, fsm} <- GameFSM.check(rules, {:continue?, continue_or_stop}) do
+      state.update_fn.(Game.to_map(game))
+
+      state
+      |> update_fsm(fsm)
+      |> update_game(game)
+      |> noreply()
+    else
+      :error -> noreply(state)
     end
   end
 
-  def handle_call({:player_input, input}, _from, game) do
-    {correct_or_incorrect, game} = Game.guess(game, input)
-    {:reply, {correct_or_incorrect, game}, game}
+  @impl true
+  def handle_call({:player_input, input}, _from, state) do
+    with {:ok, fsm} <- GameFSM.check(state.fsm, {:digit, input}),
+         {:ok, guess} <- Guess.new(GameFSM.current_guess(fsm)),
+         {correct_or_incorrect, game} = Game.guess(state.game, guess),
+         {:ok, fsm} <- GameFSM.check(fsm, {:correct?, correct_or_incorrect}) do
+      state
+      |> update_fsm(fsm)
+      |> update_game(game)
+      |> reply({GameFSM.current_guess(fsm), game})
+    else
+      :error -> reply(state, {"", state.game})
+      {:error, _reason} -> reply(state, {"", state.game})
+    end
+  end
+
+  def handle_call({:clear, seed_state}, _from, state) do
+    with {:ok, fsm} <- GameFSM.check(state.fsm, :clear) do
+      game =
+        if not GameFSM.running?(state.fsm) do
+          {:ok, game} = Game.new(seed_state)
+          game
+        else
+          state.game
+        end
+
+      state
+      |> update_fsm(fsm)
+      |> update_game(game)
+      |> reply(game)
+    else
+      :error -> reply("", state)
+    end
+  end
+
+  @spec update_game(state(), Game.t()) :: state()
+  defp update_game(state, game) do
+    %{state | game: game}
+  end
+
+  @spec update_game(state(), GameFSM.t()) :: state()
+  defp update_fsm(state, fsm) do
+    %{state | fsm: fsm}
+  end
+
+  defp reply(state, reply) do
+    {:reply, reply, state}
+  end
+
+  defp noreply(state) do
+    {:noreply, state}
   end
 end

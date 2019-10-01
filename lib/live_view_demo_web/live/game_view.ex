@@ -59,12 +59,10 @@ defmodule LiveViewDemoWeb.GameLive do
 
   defp maybe_start_game(socket) do
     if connected?(socket) do
-      {:ok, game_handle} = Games.new()
-      {:ok, timer_reference} = :timer.send_interval(1000, self(), :tick)
+      {:ok, game_handle} = Games.new(update_fn())
 
       socket
       |> assign(%{
-        timer_reference: timer_reference,
         game_handle: game_handle
       })
     else
@@ -72,15 +70,9 @@ defmodule LiveViewDemoWeb.GameLive do
     end
   end
 
-  def handle_info(:tick, socket) do
-    case Games.tick(socket.assigns.game_handle) do
-      {:continue, game} ->
-        {:noreply, assign(socket, game)}
-
-      {:stop, game} ->
-        :timer.cancel(socket.assigns.timer_reference)
-        {:noreply, assign(socket, game)}
-    end
+  defp update_fn() do
+    live_view_process = self()
+    fn game -> send(live_view_process, {:tick, game}) end
   end
 
   def handle_event("keypress", key, socket) do
@@ -111,38 +103,26 @@ defmodule LiveViewDemoWeb.GameLive do
     end
   end
 
+  def handle_info({:tick, game_state}, socket) do
+    socket
+    |> assign(game_state)
+    |> noreply()
+  end
+
   defp digit(pressed_key, socket) do
-    if Games.running?(socket.assigns.game_handle) do
-      new_guess = socket.assigns.guess <> pressed_key
+    game_state =  Games.player_input(socket.assigns.game_handle, pressed_key)
 
-      case Games.player_input(socket.assigns.game_handle, new_guess) do
-        {:correct, game_state} ->
-          socket
-          |> assign(%{guess: ""})
-          |> assign(game_state)
-          |> noreply()
-
-        {:incorrect, game_state} ->
-          socket
-          |> assign(%{guess: new_guess})
-          |> assign(game_state)
-          |> noreply()
-      end
-    else
-      noreply(socket)
-    end
+    socket
+    |> assign(game_state)
+    |> noreply()
   end
 
   defp clear(socket) do
-    if Games.running?(socket.assigns.game_handle) do
-      socket
-      |> assign(%{guess: ""})
-      |> noreply()
-    else
-      socket
-      |> maybe_start_game()
-      |> noreply()
-    end
+    game_state =  Games.clear(socket.assigns.game_handle)
+
+    socket
+    |> assign(game_state)
+    |> noreply()
   end
 
   defp noreply(socket), do: {:noreply, socket}

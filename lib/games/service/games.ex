@@ -1,27 +1,30 @@
 defmodule LiveViewDemo.Games.Service.Games do
   alias LiveViewDemo.Games.{DA, Model}
 
-  @spec new() :: {:ok, pid()}
-  def new() do
+  @type update_fn :: (map() -> :ok)
+
+  @spec new(update_fn()) :: {:ok, pid()}
+  def new(update_fn) do
     seed_state = :rand.seed_s(:exsss)
-    DA.Games.start_link(seed_state)
+    DA.Games.start_link(seed_state, update_fn)
   end
 
-  @spec player_input(pid(), String.t() | integer()) :: {:correct, map()} | {:incorrect, map()}
+  @spec player_input(pid(), String.t() | integer()) :: map()
   def player_input(pid, string_or_integer) do
-    with {:ok, guess} = Model.Guess.new(string_or_integer),
-         {correct_or_incorrect, game} = DA.Games.player_input(pid, guess) do
-      {correct_or_incorrect, Model.Game.to_map(game)}
-    end
+    {guess, game} = DA.Games.player_input(pid, string_or_integer)
+
+    game
+    |> Model.Game.to_map()
+    |> Map.put(:guess, Model.Guess.to_integer(guess))
   end
 
-  @spec tick(pid()) :: {:continue, map()} | {:stop, map()}
-  def tick(pid) do
-    with {stop_or_continue, game} = DA.Games.tick(pid) do
-      {stop_or_continue, Model.Game.to_map(game)}
-    end
-  end
+  @spec clear(pid()) :: map()
+  def clear(pid) do
+    seed_state = :rand.seed_s(:exsss)
 
-  @spec running?(pid()) :: boolean()
-  def running?(pid), do: Process.alive?(pid)
+    pid
+    |> DA.Games.clear(seed_state)
+    |> Model.Game.to_map()
+    |> Map.put(:guess, "")
+  end
 end

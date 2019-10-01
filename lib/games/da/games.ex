@@ -56,7 +56,7 @@ defmodule LiveViewDemo.Games.DA.Games do
       |> update_game(game)
       |> reply({GameFSM.current_guess(fsm), game})
     else
-      :error -> reply(state, {"", state.game})
+      :error -> reply(state, {GameFSM.current_guess(state.fsm), state.game})
       {:error, _reason} -> reply(state, {"", state.game})
     end
   end

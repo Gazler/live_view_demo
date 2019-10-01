@@ -18,6 +18,12 @@
   margin-left: auto;
   margin-right: auto;
   height: 2em;
+  height: 40px;
+}
+
+.game_over {
+  font-size: 2em;
+  height: 40px;
 }
 
 .keypad {
@@ -33,6 +39,10 @@
   align-items: center;
   background-color: #F09A9D;
   border: solid white 1px;
+}
+
+.disabled {
+  color: grey;
 }
 
 .guess {

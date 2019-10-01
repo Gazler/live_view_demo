@@ -9,7 +9,7 @@ defmodule LiveViewDemoWeb.GameLive do
   def render(assigns) do
     ~L"""
     <div phx-keydown="keypress" phx-target="window" class="page">
-      <div class="timer" style="width: <%= @remaining_time * 27 %>px;"></div>
+      <%= timer(@remaining_time) %>
       <div style="text-align: center; font-size: 2em; width: 100%;">
         Score: <%= @score %>
       </div>
@@ -20,19 +20,43 @@ defmodule LiveViewDemoWeb.GameLive do
         <p><%= @guess %>&nbsp;</p>
       </div>
       <div class="keypad">
-        <%= keypad() %>
+        <%= keypad(@remaining_time) %>
       </div>
     </div>
     """
   end
 
-  defp keypad do
-    {:safe, [Enum.map(1..9, &key/1), empty(), key(0), clear()]}
+  defp timer(remaining_time) do
+    if remaining_time == 0 do
+      {:safe,
+       """
+       <div class="game_over">Game Over</div>
+       """}
+    else
+      {:safe,
+       """
+       <div class="timer" style="width: #{remaining_time * 27}px;"></div>
+       """}
+    end
   end
 
-  defp key(digit) do
+  defp keypad(remaining_time) do
+    {:safe,
+     [
+       Enum.map(1..9, &key(&1, remaining_time)),
+       empty(),
+       key(0, remaining_time),
+       clear_button(remaining_time)
+     ]}
+  end
+
+  defp key(digit, remaining_time) do
+    disabled = if remaining_time == 0, do: "disabled", else: ""
+
     """
-    <div onclick="" class="key" phx-click="keyclick" phx-value-button="#{digit}">#{digit}</div>
+    <div onclick="" class="key #{disabled}" phx-click="keyclick" phx-value-button="#{digit}">
+      #{digit}
+    </div>
     """
   end
 
@@ -42,9 +66,11 @@ defmodule LiveViewDemoWeb.GameLive do
     """
   end
 
-  defp clear do
+  defp clear_button(remaining_time) do
+    text = if remaining_time == 0, do: "Again!", else: "Clear"
+
     """
-    <div onclick="" class="key" phx-click="keyclick" phx-value-button="clear">Clear<br />(Space)</div>
+    <div onclick="" class="key" phx-click="keyclick" phx-value-button="clear">#{text}<br />(Space)</div>
     """
   end
 
@@ -110,7 +136,7 @@ defmodule LiveViewDemoWeb.GameLive do
   end
 
   defp digit(pressed_key, socket) do
-    game_state =  Games.player_input(socket.assigns.game_handle, pressed_key)
+    game_state = Games.player_input(socket.assigns.game_handle, pressed_key)
 
     socket
     |> assign(game_state)
@@ -118,7 +144,7 @@ defmodule LiveViewDemoWeb.GameLive do
   end
 
   defp clear(socket) do
-    game_state =  Games.clear(socket.assigns.game_handle)
+    game_state = Games.clear(socket.assigns.game_handle)
 
     socket
     |> assign(game_state)

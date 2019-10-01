@@ -35,8 +35,8 @@ defmodule LiveViewDemo.Games.Model.Game do
   end
 
   @spec tick(t()) :: {:continue, t()} | {:stop, t()}
-  def tick(%Game{remaining_time: 0} = game) do
-    {:stop, game}
+  def tick(%Game{remaining_time: 1} = game) do
+    {:stop, %Game{game | remaining_time: 0}}
   end
 
   def tick(%Game{remaining_time: time} = game) when time > 0 do

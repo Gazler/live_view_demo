@@ -9,7 +9,9 @@ defmodule LiveViewDemoWeb.GameLive do
   def render(assigns) do
     ~L"""
     <div phx-keydown="keypress" phx-target="window" class="page">
-      <%= timer(@remaining_time) %>
+      <div class="timer-container">
+        <%= timer(@remaining_time) %>
+      </div>
       <div style="text-align: center; font-size: 2em; width: 100%;">
         Score: <%= @score %>
       </div>
@@ -30,7 +32,7 @@ defmodule LiveViewDemoWeb.GameLive do
     if remaining_time == 0 do
       {:safe,
        """
-       <div class="game_over">Game Over</div>
+       <div class="game-over">Game Over</div>
        """}
     else
       {:safe,

@@ -22,7 +22,7 @@ defmodule LiveViewDemoWeb.GameLive do
         <p><%= @guess %>&nbsp;</p>
       </div>
       <div class="keypad">
-        <%= keypad(@remaining_time) %>
+        <%= keypad(@disabled) %>
       </div>
     </div>
     """
@@ -42,21 +42,21 @@ defmodule LiveViewDemoWeb.GameLive do
     end
   end
 
-  defp keypad(remaining_time) do
+  defp keypad(disabled) do
     {:safe,
      [
-       Enum.map(1..9, &key(&1, remaining_time)),
+       Enum.map(1..9, &key(&1, disabled)),
        empty(),
-       key(0, remaining_time),
-       clear_button(remaining_time)
+       key(0, disabled),
+       clear_button(disabled)
      ]}
   end
 
-  defp key(digit, remaining_time) do
-    disabled = if remaining_time == 0, do: "disabled", else: ""
+  defp key(digit, disabled) do
+    disabled_class = if disabled, do: "disabled", else: ""
 
     """
-    <div onclick="" class="key #{disabled}" phx-click="keyclick" phx-value-button="#{digit}">
+    <div onclick="" class="key #{disabled_class}" phx-click="keyclick" phx-value-button="#{digit}">
       #{digit}
     </div>
     """
@@ -68,8 +68,8 @@ defmodule LiveViewDemoWeb.GameLive do
     """
   end
 
-  defp clear_button(remaining_time) do
-    text = if remaining_time == 0, do: "Again!", else: "Clear"
+  defp clear_button(disabled) do
+    text = if disabled, do: "Again!", else: "Clear"
 
     """
     <div onclick="" class="key" phx-click="keyclick" phx-value-button="clear">#{text}<br />(Space)</div>
@@ -80,7 +80,7 @@ defmodule LiveViewDemoWeb.GameLive do
     socket =
       socket
       |> maybe_start_game()
-      |> assign(%{remaining_time: 0, puzzle: "", guess: "", score: 0})
+      |> assign(%{disabled: false, remaining_time: 0, puzzle: "", guess: "", score: 0})
 
     {:ok, socket}
   end
@@ -89,10 +89,7 @@ defmodule LiveViewDemoWeb.GameLive do
     if connected?(socket) do
       {:ok, game_handle} = Games.new(update_fn())
 
-      socket
-      |> assign(%{
-        game_handle: game_handle
-      })
+      assign(socket, %{game_handle: game_handle})
     else
       socket
     end
@@ -133,7 +130,7 @@ defmodule LiveViewDemoWeb.GameLive do
 
   def handle_info({:tick, game_state}, socket) do
     socket
-    |> assign(game_state)
+    |> assign(Map.put(game_state, :disabled, game_state.remaining_time == 0))
     |> noreply()
   end
 
@@ -141,7 +138,7 @@ defmodule LiveViewDemoWeb.GameLive do
     game_state = Games.player_input(socket.assigns.game_handle, pressed_key)
 
     socket
-    |> assign(game_state)
+    |> assign(Map.put(game_state, :disabled, game_state.remaining_time == 0))
     |> noreply()
   end
 
@@ -149,7 +146,7 @@ defmodule LiveViewDemoWeb.GameLive do
     game_state = Games.clear(socket.assigns.game_handle)
 
     socket
-    |> assign(game_state)
+    |> assign(Map.put(game_state, :disabled, game_state.remaining_time == 0))
     |> noreply()
   end
 
